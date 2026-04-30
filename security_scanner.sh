@@ -113,8 +113,17 @@ find_world_writable() {
     #     ((count++))
     # done < <(find "$TEST_DIR" -perm -002)
 
-    # YOUR CODE HERE
+    while IFS= read -r item; do
+        perms=$(stat -c "%a" "$item")
 
+        if [ -f "$item" ]; then
+            echo -e "${RED}[FILE]${NC} $item ($perms)"
+        elif [ -d "$item" ]; then
+            echo -e "${RED}[DIR] ${NC} $item ($perms)"
+        fi
+
+        ((count++))
+    done < <(find "$TEST_DIR" -perm -002)
 
     echo ""
     echo "Found $count world-writable items"
@@ -157,8 +166,11 @@ find_executable_non_scripts() {
     #     ((count++))
     # done < <(find "$TEST_DIR" -type f \( -name "*.html" -o -name "*.css" -o -name "*.txt" -o -name "*.conf" \) -perm /111)
 
-    # YOUR CODE HERE
-
+    while IFS= read -r file; do
+        perms=$(stat -c "%a" "$file")
+        echo -e "${YELLOW}[EXEC]${NC} $file ($perms)"
+        ((count++))
+    done < <(find "$TEST_DIR" -type f \( -name "*.html" -o -name "*.css" -o -name "*.txt" -o -name "*.conf" \) -perm /111)
 
     echo ""
     echo "Found $count files that shouldn't be executable"
